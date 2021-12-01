@@ -16,6 +16,154 @@
         camera.position.set(0,0,40); // change parameters as needed
     }
 
+    function createEye(radius) {
+        var eye = new THREE.Object3D();
+
+        var eyeMat = new THREE.MeshBasicMaterial( { color: "black" } );
+        var eyeGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2);
+        var eyeMesh = new THREE.Mesh(eyeMat, eyeGeom);
+
+        return eye;
+    }
+
+    function createHead(radius, height) {
+        // create a cylinder with a rounded edge using a semisphere
+        // add small semisphere eyes of 1/8 the radius? 
+        // articulation point at flat side of cylinder construct
+
+        // create head container
+        // create cylinder container:
+            // add cylinder mesh. 
+            // add semisphere mesh. position it y = height/2 (at the edge of the cylinder)
+            // add right semisphere eye (facing left). position it y = height/2. rotate x -90 deg. position z = -radius
+            // add left semisphere eye. position it y = height/2. rotate x +90 deg. position z = radius
+        // add cylinder container to head container. position cylinder container y = height/2
+
+        var head = new THREE.Object3D();
+        
+        var cylinder = new THREE.Object3D();
+        var cylinderMat = new THREE.MeshPhongMaterial( { color:"lightgreen" } );
+        var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
+        var cylinderMesh = new THREE.Mesh(cylinderMat, cylinderGeom);
+        cylinder.add(cylinderMesh);
+
+        var sphereMat = new three.MeshPhongMaterial( { color: "lightgreen" } );
+        var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
+        var sphereMesh = new THREE.Mesh(sphereMat, sphereGeom);
+        cylinder.add(sphereMesh);
+        sphereMesh.position.y = height/2;
+
+        var eyeR = createEye(radius * 0.15);
+        cylinder.add(eyeR);
+        eyeR.position.y = height/2;
+        eyeR.rotation.x = -Math.PI/2;
+        eyeR.position.z = -radius;
+
+        var eyeL = createEye(radius * 0.15);
+        cylinder.add(eyeL);
+        eyeL.position.y = height/2;
+        eyeL.rotation.x = Math.PI/2;
+        eyeL.position.z = radius;
+
+        head.add(cylinder);
+        cylinder.position.y = height/2;
+
+        return head;
+    }
+
+    function createLeg(radius, height) {
+        // create a cylinder with a rounded edge using a semisphere
+        // articulation point at flat side of cylinder construct
+
+        // create leg container
+        // create cylinder container:
+            // add cylinder mesh. 
+            // add semisphere mesh. position it y = height/2 (at the edge of the cylinder)
+        // add cylinder container to leg container. position cylinder container y = height/2. rotatez +180
+
+        var leg = new THREE.Object3D();
+
+        var cylinder = new THREE.Object3D();
+        var cylinderMat = new THREE.MeshPhongMaterial( { color:"lightgreen" } );
+        var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
+        var cylinderMesh = new THREE.Mesh(cylinderMat, cylinderGeom);
+        cylinder.add(cylinderMesh);
+
+        var sphereMat = new three.MeshPhongMaterial( { color: "lightgreen" } );
+        var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
+        var sphereMesh = new THREE.Mesh(sphereMat, sphereGeom);
+        cylinder.add(sphereMesh);
+        sphereMesh.position.y = height/2;
+
+        leg.add(cylinder);
+        cylinder.position.y = height/2;
+        cylinder.rotation.z = Math.PI;
+
+        return leg;
+    }
+
+    function createShell(radius) {
+        // create a semisphere 
+        // articulation point at bottom (flat side)
+
+        // create shell container
+        // add semisphere mesh. position semisphere mesh y = radius. 
+
+        var shell = new THREE.Object3D();
+
+        var shellMat = new THREE.MeshPhongMaterial( { color: "darkgreen" } );
+        var shellGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
+        var shellMesh = new THREE.Mesh(shellMat, shellGeom);
+        shell.add(shellMesh);
+
+        shellMesh.position.y = radius;
+    }
+
+    function createTail(radius, height) {
+        // create a cone
+        // articulation point at bottom face
+
+        // create tail container
+        // add cone mesh. position cone mesh y = height/2
+
+        var tail = new THREE.Object3D();
+
+        var tailMat = new THREE.MeshPhongMaterial( { color: "lightgreen" } );
+        var tailGeom = new THREE.ConeGeometry(radius, height, 16, 1, false);
+        var tailMesh = new THREE.Mesh(tailMat, tailGeom);
+        tail.add(tailMesh);
+
+        tailMesh.position.y = height/2;
+    }
+
+    function createTortoise(shellRadius, legRadius, legLength, headRadius, neckLength, tailLength) {
+        // combine a head, 4 legs, a shell, and a tail
+
+        // create tortoise container
+        
+        // create shell
+        // add shell. shell gets lifted y + legLength to show legs (legs are independent of shell)
+
+        // add head. rotate z = +90. position y + headRadius. position x = -shellRadius when showing (facing the left) (head is independent of shell)
+
+        // add front left leg. x = -(shellradius * sqrt2)/2. z = +(shellradius * sqrt2)/2 
+        // add front right leg. x = -(shellradius * sqrt2)/2. z = -(shellradius * sqrt2)/2
+        // add back left leg. x = +(shellradius * sqrt2)/2. z = +(shellradius * sqrt2)/2
+        // add back right leg. x = +(shellradius * sqrt2)/2. z = -(shellradius * sqrt2)/2
+
+        // add tail. x = shellradius.
+
+        var tortoise = new THREE.Object3D();
+
+        var shell = createShell(5);
+        tortoise.add(shell);
+
+    }
+
+    function createBackground() {
+
+    }
+
     // Create the scene. This function is called once, as soon as the page loads.
     // The renderer has already been created before this function is called.
     function createScene() {
