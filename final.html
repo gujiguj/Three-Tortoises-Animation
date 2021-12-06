@@ -10,10 +10,26 @@
     var scene, camera, renderer; // Three.js rendering basics
     var canvas; // The canvas on which the image is rendered
 
-    var bigTortoise;
 
+    var shellRadius = 6;
+    var legRadius = 1;
+    var legLength = 2;
+    var headRadius = 1;
+    var neckLength = 4;
+    var tailRadius = 1;
+    var tailLength = 3;
+
+    var big;
     var bigShell; var bigHead; var bigTail;
     var bigLegFL; var bigLegFR; var bigLegBL; var bigLegBR;
+
+    var mid;
+    var midShell; var midHead; var midTail;
+    var midLegFL; var midLegFR; var midLegBL; var midLegBR;
+
+    var small;
+    var smallShell; var smallHead; var smallTail;
+    var smallLegFL; var smallLegFR; var smallLegBL; var smallLegBR;
 
     var mouse;
     var keyboard = new KeyboardState();
@@ -179,13 +195,6 @@
         // add back right leg. x = +(shellradius * sqrt2)/2. z = -(shellradius * sqrt2)/2
 
         // add tail. x = shellradius. rotation z -= 90deg
-        var shellRadius = 6;
-        var legRadius = 1;
-        var legLength = 2;
-        var headRadius = 1;
-        var neckLength = 3;
-        var tailRadius = 1;
-        var tailLength = 3;
 
         var tortoise = new THREE.Object3D();
 
@@ -254,20 +263,131 @@
         renderer.setClearColor(0); // Set background color (0, or 0x000000, is black)
         scene = new THREE.Scene(); // Create a new scene which we can add objects to
 
-        //var bigTortoise = createTortoise();
-        //scene.add(bigTortoise);
-
-        bigTortoise = createTortoise();
-
-        bigShell = bigTortoise.children[0];
+        big = createTortoise();
+        bigShell = big.children[0];
         bigHead = bigShell.children[1];
         bigTail = bigShell.children[2];
-        bigLegFL = bigTortoise.children[1];
-        bigLegFR = bigTortoise.children[2];
-        bigLegBL = bigTortoise.children[3];
-        bigLegBR = bigTortoise.children[4];
+        bigLegFL = big.children[1];
+        bigLegFR = big.children[2];
+        bigLegBL = big.children[3];
+        bigLegBR = big.children[4];
+        scene.add(big);
+        bigShell.position.y = 0;
+        //bigHead.position.x = -shellRadius + neckLength;
+        bigHead.position.x = -shellRadius + 0.4;
+
+        mid = createTortoise();
+        midShell = mid.children[0];
+        midHead = midShell.children[1];
+        midTail = midShell.children[2];
+        midLegFL = mid.children[1];
+        midLegFR = mid.children[2];
+        midLegBL = mid.children[3];
+        midLegBR = mid.children[4];
+        scene.add(mid);
+        mid.scale.set(0.5,0.5,0.5);
+        mid.position.y = shellRadius;
+        //midShell.position.y -= legLength;
+        midHead.position.x = -shellRadius + neckLength + 0.4;
+
+        small = createTortoise();
+        smallShell = small.children[0];
+        smallHead = smallShell.children[1];
+        smallTail = smallShell.children[2];
+        smallLegFL = small.children[1];
+        smallLegFR = small.children[2];
+        smallLegBL = small.children[3];
+        smallLegBR = small.children[4];
+        scene.add(small);
+        small.scale.set(0.25,0.25,0.25);
+        small.position.y += shellRadius + shellRadius*0.5;
+        //smallShell.position.y -= legLength;
+
+        /*
+        small.position.y = (shellRadius/2) * Math.sqrt(2)/2 + shellRadius;
+        small.position.x = -(shellRadius/2) * Math.sqrt(2)/2;
+        small.rotation.z = Math.PI/4;
+        */
+
+        /*
+        small.position.y = (shellRadius/2) * Math.sqrt(2)/2 + shellRadius + legLength/2;
+        small.position.x = -(shellRadius/2) * Math.sqrt(2)/2;
+        small.rotation.z = Math.PI/4;
+        */
+
+        /*
+        small.rotation.z = Math.PI/2;
+        small.position.y = (shellRadius/2) * Math.sqrt(2)/2 + shellRadius + legLength/2 + 2;
+        small.position.x = -(shellRadius/2) * Math.sqrt(2)/2 - 2;
+        smallHead.position.x = -shellRadius + neckLength + 0.4;
+        smallShell.position.y = 0;
+        */
+
+        /*
+        small.rotation.z = 3*Math.PI/4;
+        small.position.y = shellRadius;
+        small.position.x = -shellRadius;
+        smallHead.position.x = -shellRadius + neckLength + 0.4;
+        smallShell.position.y = 0;
+
+        midHead.position.x = -shellRadius + 0.4;
+        midHead.rotation.z = 2.2;
+        */
+
+        /*
+        small.rotation.z = Math.PI;
+        small.position.y = headRadius*2 + shellRadius*0.25;
+        small.position.x = -shellRadius - 2;
+        smallHead.position.x = -shellRadius + neckLength + 0.4;
+        smallShell.position.y = 0;
+
+        midHead.position.x = -shellRadius + 0.4;
+        midHead.rotation.z = 3*Math.PI/4;
+        */
+
+        /*
+        small.rotation.z = Math.PI;
+        small.position.y = headRadius*2 + shellRadius*0.25;
+        small.position.x = -shellRadius - 2;
+        smallHead.position.x = -shellRadius + 0.4;
+        smallShell.position.y = 0;
+        smallLegFL.position.y = 0;
+        smallLegFR.position.y = 0;
+        smallLegBL.position.y = 0;
+        smallLegBR.position.y = 0;
         
-        scene.add(bigTortoise);
+        midHead.position.x = -shellRadius + 0.4;
+        midHead.rotation.z = 3*Math.PI/4;
+        */
+
+        /*
+        small.rotation.z = Math.PI;
+        small.position.y = headRadius*2 + shellRadius*0.25 + legLength;
+        small.position.x = -shellRadius - 2;
+        smallHead.position.x = -shellRadius + 0.4;
+        smallShell.position.y = 0;
+
+        midHead.position.x = -shellRadius + 0.4;
+        midHead.rotation.z = 3*Math.PI/4;
+        mid.position.y = shellRadius + legLength;
+
+        bigShell.position.y = legLength;
+        bigHead.position.x = -shellRadius + 0.4;
+        */
+
+        small.position.y = 4.4;
+        small.position.x = -shellRadius - 2;
+        smallHead.position.x = -shellRadius + 0.4;
+        smallShell.position.y = 0;
+        small.rotation.z = -2.5;
+
+        midHead.position.x = -shellRadius + 0.4;
+        midHead.rotation.z = 3*Math.PI/4;
+        mid.position.y = shellRadius + legLength;
+
+        bigShell.position.y = legLength;
+        bigHead.position.x = -shellRadius + 0.4;
+        bigHead.rotation.z = 2.2
         
         var background = createBackground(50,50,50);
         scene.add(background);
@@ -300,7 +420,7 @@
             console.log("front left leg rotation: " + bigLegFL.rotation.z);
             console.log("front right leg rotation: " + bigLegFR.rotation.z);
             console.log("head rotation: " + bigHead.rotation.z);
-            console.log("tortoise rotation: " + bigTortoise.rotation.z);
+            console.log("tortoise rotation: " + big.rotation.z);
         }
 
         if ( keyboard.pressed("up")) {
@@ -340,10 +460,10 @@
         }
 
         if ( keyboard.pressed("C")) {
-            bigTortoise.rotation.z -= 0.05;
+            big.rotation.z -= 0.05;
         }
         if ( keyboard.pressed("Z")) {
-            bigTortoise.rotation.z += 0.05;
+            big.rotation.z += 0.05;
         }
     } 
 
