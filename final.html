@@ -10,10 +10,22 @@
     var scene, camera, renderer; // Three.js rendering basics
     var canvas; // The canvas on which the image is rendered
 
+    var bigTortoise;
+
+    var bigShell; var bigHead; var bigTail;
+    var bigLegFL; var bigLegFR; var bigLegBL; var bigLegBR;
+
+    var mouse;
+    var keyboard = new KeyboardState();
+
+    var ambient; var eyeLight; var topLight;
+
     // Create a camera, sitting on the positive z-axis.  The camera is not part of the scene
     function createCamera() {
         camera = new THREE.PerspectiveCamera(40, canvas.width/canvas.height, 0.1, 500);
         camera.position.set(0,0,40); // change parameters as needed
+
+        mouse = new THREE.OrbitControls(camera, renderer.domElement);
     }
 
     function createEye(radius) {
@@ -21,7 +33,9 @@
 
         var eyeMat = new THREE.MeshBasicMaterial( { color: "black" } );
         var eyeGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2);
-        var eyeMesh = new THREE.Mesh(eyeMat, eyeGeom);
+        var eyeMesh = new THREE.Mesh(eyeGeom, eyeMat);
+
+        eye.add(eyeMesh);
 
         return eye;
     }
@@ -40,16 +54,17 @@
         // add cylinder container to head container. position cylinder container y = height/2
 
         var head = new THREE.Object3D();
+        height = height-radius;
         
         var cylinder = new THREE.Object3D();
         var cylinderMat = new THREE.MeshPhongMaterial( { color:"lightgreen" } );
         var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
-        var cylinderMesh = new THREE.Mesh(cylinderMat, cylinderGeom);
+        var cylinderMesh = new THREE.Mesh(cylinderGeom, cylinderMat);
         cylinder.add(cylinderMesh);
 
-        var sphereMat = new three.MeshPhongMaterial( { color: "lightgreen" } );
+        var sphereMat = new THREE.MeshPhongMaterial( { color: "lightgreen" } );
         var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
-        var sphereMesh = new THREE.Mesh(sphereMat, sphereGeom);
+        var sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
         cylinder.add(sphereMesh);
         sphereMesh.position.y = height/2;
 
@@ -82,22 +97,25 @@
         // add cylinder container to leg container. position cylinder container y = height/2. rotatez +180
 
         var leg = new THREE.Object3D();
+        
+        height = height-radius;
 
         var cylinder = new THREE.Object3D();
         var cylinderMat = new THREE.MeshPhongMaterial( { color:"lightgreen" } );
         var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
-        var cylinderMesh = new THREE.Mesh(cylinderMat, cylinderGeom);
+        var cylinderMesh = new THREE.Mesh(cylinderGeom, cylinderMat);
         cylinder.add(cylinderMesh);
 
-        var sphereMat = new three.MeshPhongMaterial( { color: "lightgreen" } );
+        var sphereMat = new THREE.MeshPhongMaterial( { color: "lightgreen" } );
         var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
-        var sphereMesh = new THREE.Mesh(sphereMat, sphereGeom);
+        var sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
         cylinder.add(sphereMesh);
         sphereMesh.position.y = height/2;
 
         leg.add(cylinder);
         cylinder.position.y = height/2;
         cylinder.rotation.z = Math.PI;
+        cylinder.position.y -= height;
 
         return leg;
     }
@@ -113,10 +131,17 @@
 
         var shellMat = new THREE.MeshPhongMaterial( { color: "darkgreen" } );
         var shellGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
-        var shellMesh = new THREE.Mesh(shellMat, shellGeom);
+        var shellMesh = new THREE.Mesh(shellGeom, shellMat);
         shell.add(shellMesh);
+        
+        var capGeom = new THREE.CircleGeometry(radius, 32);
+        var capMat = new THREE.MeshBasicMaterial( { color: "darkgreen" });
+        var capMesh = new THREE.Mesh(capGeom, shellMat);
+        capMesh.rotation.x = Math.PI / 2;
+        shellMesh.add(capMesh);
 
-        shellMesh.position.y = radius;
+        console.log("created shell:");
+        return shell;
     }
 
     function createTail(radius, height) {
@@ -130,13 +155,15 @@
 
         var tailMat = new THREE.MeshPhongMaterial( { color: "lightgreen" } );
         var tailGeom = new THREE.ConeGeometry(radius, height, 16, 1, false);
-        var tailMesh = new THREE.Mesh(tailMat, tailGeom);
+        var tailMesh = new THREE.Mesh(tailGeom, tailMat);
         tail.add(tailMesh);
 
         tailMesh.position.y = height/2;
+
+        return tail;
     }
 
-    function createTortoise(shellRadius, legRadius, legLength, headRadius, neckLength, tailLength) {
+    function createTortoise() {
         // combine a head, 4 legs, a shell, and a tail
 
         // create tortoise container
@@ -151,17 +178,73 @@
         // add back left leg. x = +(shellradius * sqrt2)/2. z = +(shellradius * sqrt2)/2
         // add back right leg. x = +(shellradius * sqrt2)/2. z = -(shellradius * sqrt2)/2
 
-        // add tail. x = shellradius.
+        // add tail. x = shellradius. rotation z -= 90deg
+        var shellRadius = 6;
+        var legRadius = 1;
+        var legLength = 2;
+        var headRadius = 1;
+        var neckLength = 3;
+        var tailRadius = 1;
+        var tailLength = 3;
 
         var tortoise = new THREE.Object3D();
 
-        var shell = createShell(5);
+        var shell = createShell(shellRadius);
         tortoise.add(shell);
+        shell.position.y += legLength;
 
+        var head = createHead(headRadius, neckLength);
+        shell.add(head);
+
+        head.rotation.z += Math.PI/2;
+        head.position.y += headRadius;
+        head.position.x -= shellRadius - 0.4;
+
+        var legFL = createLeg(legRadius, legLength);
+        var legFR = createLeg(legRadius, legLength);
+        var legBL = createLeg(legRadius, legLength);
+        var legBR = createLeg(legRadius, legLength);
+        tortoise.add(legFL); tortoise.add(legFR); tortoise.add(legBL); tortoise.add(legBR);
+
+        var legDistance = (shellRadius*Math.sqrt(2))/2 - legRadius;
+
+        legFL.position.x -= legDistance;
+        legFR.position.x -= legDistance;
+        legBL.position.x += legDistance;
+        legBR.position.x += legDistance;
+        
+        legFL.position.y += legLength;
+        legFR.position.y += legLength;
+        legBL.position.y += legLength;
+        legBR.position.y += legLength;
+
+        legFL.position.z += legDistance;
+        legFR.position.z -= legDistance;
+        legBL.position.z += legDistance;
+        legBR.position.z -= legDistance;
+
+        var tail = createTail(tailRadius, tailLength);
+        shell.add(tail);
+
+        tail.position.x += shellRadius - 0.4;
+        tail.position.y += tailRadius;
+        tail.rotation.z -= Math.PI/2;
+
+        return tortoise;
     }
 
-    function createBackground() {
+    function createBackground(length, width, height) {
 
+        var background = new THREE.Object3D(); 
+
+        // create ground
+        var geom = new THREE.PlaneGeometry(length, width); 
+        var material = new THREE.MeshBasicMaterial({color:"darkgreen", side: THREE.DoubleSide}); 
+        var ground = new THREE.Mesh( geom, material);
+        ground.rotation.x = Math.PI/2;
+        background.add(ground);
+
+        return background;
     }
 
     // Create the scene. This function is called once, as soon as the page loads.
@@ -170,8 +253,99 @@
 
         renderer.setClearColor(0); // Set background color (0, or 0x000000, is black)
         scene = new THREE.Scene(); // Create a new scene which we can add objects to
+
+        //var bigTortoise = createTortoise();
+        //scene.add(bigTortoise);
+
+        bigTortoise = createTortoise();
+
+        bigShell = bigTortoise.children[0];
+        bigHead = bigShell.children[1];
+        bigTail = bigShell.children[2];
+        bigLegFL = bigTortoise.children[1];
+        bigLegFR = bigTortoise.children[2];
+        bigLegBL = bigTortoise.children[3];
+        bigLegBR = bigTortoise.children[4];
         
+        scene.add(bigTortoise);
+        
+        var background = createBackground(50,50,50);
+        scene.add(background);
    }
+
+   function createLights()
+    {
+        // Ambient Light (color, intensity)
+        ambient = new THREE.AmbientLight(0x404040, 1); // soft white
+        scene.add(ambient);
+
+        // DirectionalLight (color, intensity) in the direction the camera faces
+        eyeLight = new THREE.DirectionalLight( "white", 0.7 );   
+        eyeLight.position.set(camera.position.x,camera.position.y,camera.position.z);  // camera viewpoint
+        scene.add(eyeLight);
+
+        // Dim DirectionalLight (color, intensity) shining from above
+        topLight = new THREE.DirectionalLight( "white", 0.3 ); 
+        topLight.position.set(0,20,0);
+        scene.add( topLight );
+
+        var helper = new THREE.DirectionalLightHelper( topLight, 1 );
+        //scene.add( helper );
+    }
+
+    function update() {
+        keyboard.update();
+
+        if ( keyboard.down("P") ) {
+            console.log("front left leg rotation: " + bigLegFL.rotation.z);
+            console.log("front right leg rotation: " + bigLegFR.rotation.z);
+            console.log("head rotation: " + bigHead.rotation.z);
+            console.log("tortoise rotation: " + bigTortoise.rotation.z);
+        }
+
+        if ( keyboard.pressed("up")) {
+            bigHead.rotation.z -= 0.05;
+        }
+        if ( keyboard.pressed("down")) {
+            bigHead.rotation.z += 0.05;
+        }
+
+
+        if ( keyboard.pressed("A")) {
+            bigLegFL.rotation.z -= 0.05;
+        }
+        if ( keyboard.pressed("D")) {
+            bigLegFL.rotation.z += 0.05;
+        }
+
+        if ( keyboard.pressed("Q")) {
+            bigLegFR.rotation.z -= 0.05;
+        }
+        if ( keyboard.pressed("E")) {
+            bigLegFR.rotation.z += 0.05;
+        }
+
+        if ( keyboard.pressed("left")) {
+            bigLegBL.rotation.z -= 0.05;
+        }
+        if ( keyboard.pressed("right")) {
+            bigLegBL.rotation.z += 0.05;
+        }
+
+        if ( keyboard.pressed(",")) {
+            bigLegBR.rotation.z -= 0.05;
+        }
+        if ( keyboard.pressed(".")) {
+            bigLegBR.rotation.z += 0.05;
+        }
+
+        if ( keyboard.pressed("C")) {
+            bigTortoise.rotation.z -= 0.05;
+        }
+        if ( keyboard.pressed("Z")) {
+            bigTortoise.rotation.z += 0.05;
+        }
+    } 
 
     // Render the scene. This is called for each frame of the animation.
     function render() {
@@ -180,6 +354,9 @@
         // code for things to change here
 
         renderer.render(scene, camera);
+
+        //update();
+        mouse.update();
     }
 
     //----------------------------------------------------------------------------------
@@ -200,6 +377,9 @@
         
         // create scene 
         createScene();
+
+        // create lights
+        createLights();
 
         // render scene
         render();
