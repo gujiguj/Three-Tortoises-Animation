@@ -18,6 +18,7 @@
     var neckLength = 4;
     var tailRadius = 1;
     var tailLength = 3;
+    var tuck = 0.4;
 
     var big;
     var bigShell; var bigHead; var bigTail;
@@ -35,6 +36,82 @@
     var keyboard = new KeyboardState();
 
     var ambient; var eyeLight; var topLight;
+    
+    // Use a clock to keep track of time (clock starts automatically)
+    var clock = new THREE.Clock();
+
+    // Time at the beginning of animation 
+    var startTime = clock.getElapsedTime();
+
+    var keyframesBig = [
+        //z-rotations!!!
+        //(11) [time stamp, tortoise x, tortoise y, tortoise z-rotation, shell y, head x, head rotation, legFL rotation, legFR rotation, legBL rotation, legBR rotation]
+        [0, 0.0, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
+        [0.4, 0.0, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // right before Small dies
+        [0.45, 0.0, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // show head and catch Small
+        [0.55, 0.0, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // holding small
+        [0.65, 0.0, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // standing up
+        [0.8, 0.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], // tilting head down for small
+        [1.0, 0.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], // tilting head down for small
+    ]; 
+
+    var keyframesMid = [
+        //z-rotations!!!
+        //(11) [time stamp, tortoise x, tortoise y, tortoise rotation, shell y, head x, head rotation, legFL rotation, legFR rotation, legBL rotation, legBR rotation]
+        [0, 0.0, shellRadius, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
+        [0.2, 0.0, shellRadius, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // right before standing up
+        [0.25, 0.0, shellRadius, 0.0, legLength, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // standing up quickly, no head
+        [0.3, 0.0, shellRadius, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // head comes out quickly
+        [0.45, 0.0, shellRadius, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // watching Small on Big's head
+        [0.55, 0.0, shellRadius, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // watching Small on Big's head
+        [0.65, 0.0, shellRadius + legLength, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // lifted by Big
+        [1.0, 0.0, shellRadius + legLength, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // lifted by Big
+    ];
+
+    var keyframesSmall = [
+        //z-rotations!!!
+        //(11) [time stamp, tortoise x, tortoise y, tortoise rotation, shell y, head x, head rotation, legFL rotation, legFR rotation, legBL rotation, legBR rotation]
+        [0, 0.0, shellRadius*1.5, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
+        [0.1, 0.0, shellRadius*1.5, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // standing up and showing head
+        [0.2, -(shellRadius/2) * (Math.sqrt(2)/2), (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius, Math.PI/4, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // walking off Mid
+        [0.25, -(shellRadius/2) * (Math.sqrt(2)/2), (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius + (legLength/2), Math.PI/4, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // Mid gets up
+        [0.3, -(shellRadius/2) * (Math.sqrt(2)/2) - 2, (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius + legLength/2 + 2, Math.PI/2, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // thrown
+        [0.4, -shellRadius - 1, shellRadius, 3*Math.PI/4, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // about to die
+        [0.45, -shellRadius - 2, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // caught by Big
+        [0.5, -shellRadius - 2, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // remain for a sec
+        [0.55, -shellRadius - 2, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // head comes out
+        [0.65, -shellRadius - 2, headRadius*2 + shellRadius*0.25 + legLength, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // lifted by big
+        [0.8, -shellRadius - 2, 4.4, Math.PI + 0.64, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // rolling off
+        [0.85, -shellRadius - 4.5, 2.0, Math.PI + Math.PI/2, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // almost rolled off
+        [0.9, -shellRadius - 5, 0.0, 2*Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // head comes out
+        [1.0, -shellRadius - 5, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // legs come out
+    ];
+
+    // TODO Step 5: Copy and paste the code for keyframeInterp here
+    // keyframes, duration of one animation cycle (in seconds), time elapsed since beginning of animation
+    function keyframeInterp(keyframes, cycleTime, animTime) {
+
+        var keys=[];  // array of interpolated values
+        var nKeys = keyframes[0].length-1;  // number of keys = 2
+
+        // find time elapsed within the current cycle and scale to [0,1]
+        var time = (animTime % cycleTime) / cycleTime; // what percentage of a cycle has been done already
+
+        // find the next keyframe based on time
+        for (var i = 0; i < keyframes.length; i++) {
+            if (time < keyframes[i][0]) break;
+        }
+        i = i-1; // previous keyframe is at index i-1
+
+        // scale interpolation parameter t to interval [0,1]
+        var t = (time - keyframes[i][0]) / (keyframes[i+1][0] - keyframes[i][0]); // what percentage t of interpolation between keyframes has been done already
+
+        // linear interpolation between keyframes i and i+1 
+        for(var j = 1; j <= nKeys; j++)
+            keys.push((1-t) * keyframes[i][j] + t * keyframes[i+1][j]); 
+
+        return keys; // returns list of interpolated rotations
+    }
 
     // Create a camera, sitting on the positive z-axis.  The camera is not part of the scene
     function createCamera() {
@@ -246,14 +323,26 @@
 
         var background = new THREE.Object3D(); 
 
+        var grassTex = texLoader.load("bg-grass-texture.jpg");
+        grassTex.wrapS = THREE.RepeatWrapping;
+        grassTex.wrapT = THREE.RepeatWrapping;
+        grassTex.repeat.set(2,2);
+        var material = new THREE.MeshPhongMaterial({map: grassTex, side: THREE.DoubleSide}); 
+
         // create ground
         var geom = new THREE.PlaneGeometry(length, width); 
-        var material = new THREE.MeshBasicMaterial({color:"darkgreen", side: THREE.DoubleSide}); 
         var ground = new THREE.Mesh( geom, material);
         ground.rotation.x = Math.PI/2;
         background.add(ground);
 
-        return background;
+        /*
+        var ballGeom = new THREE.SphereGeometry(3.0, 32, 32, 0, 2*Math.PI, 0, 2*Math.PI );
+        var ball = new THREE.Mesh(ballGeom, polkaDotMat);
+        ball.position.y += 3;
+        background.add(ball);
+        */
+
+        return background; 
     }
 
     // Create the scene. This function is called once, as soon as the page loads.
@@ -301,85 +390,13 @@
         scene.add(small);
         small.scale.set(0.25,0.25,0.25);
         small.position.y += shellRadius + shellRadius*0.5;
-        //smallShell.position.y -= legLength;
 
         /*
-        small.position.y = (shellRadius/2) * Math.sqrt(2)/2 + shellRadius;
-        small.position.x = -(shellRadius/2) * Math.sqrt(2)/2;
-        small.rotation.z = Math.PI/4;
-        */
-
-        /*
-        small.position.y = (shellRadius/2) * Math.sqrt(2)/2 + shellRadius + legLength/2;
-        small.position.x = -(shellRadius/2) * Math.sqrt(2)/2;
-        small.rotation.z = Math.PI/4;
-        */
-
-        /*
-        small.rotation.z = Math.PI/2;
-        small.position.y = (shellRadius/2) * Math.sqrt(2)/2 + shellRadius + legLength/2 + 2;
-        small.position.x = -(shellRadius/2) * Math.sqrt(2)/2 - 2;
-        smallHead.position.x = -shellRadius + neckLength + 0.4;
-        smallShell.position.y = 0;
-        */
-
-        /*
-        small.rotation.z = 3*Math.PI/4;
-        small.position.y = shellRadius;
-        small.position.x = -shellRadius;
-        smallHead.position.x = -shellRadius + neckLength + 0.4;
-        smallShell.position.y = 0;
-
-        midHead.position.x = -shellRadius + 0.4;
-        midHead.rotation.z = 2.2;
-        */
-
-        /*
-        small.rotation.z = Math.PI;
-        small.position.y = headRadius*2 + shellRadius*0.25;
-        small.position.x = -shellRadius - 2;
-        smallHead.position.x = -shellRadius + neckLength + 0.4;
-        smallShell.position.y = 0;
-
-        midHead.position.x = -shellRadius + 0.4;
-        midHead.rotation.z = 3*Math.PI/4;
-        */
-
-        /*
-        small.rotation.z = Math.PI;
-        small.position.y = headRadius*2 + shellRadius*0.25;
-        small.position.x = -shellRadius - 2;
+        small.position.y = 2.0;
+        small.position.x = -shellRadius - 4.5;
         smallHead.position.x = -shellRadius + 0.4;
         smallShell.position.y = 0;
-        smallLegFL.position.y = 0;
-        smallLegFR.position.y = 0;
-        smallLegBL.position.y = 0;
-        smallLegBR.position.y = 0;
-        
-        midHead.position.x = -shellRadius + 0.4;
-        midHead.rotation.z = 3*Math.PI/4;
-        */
-
-        /*
-        small.rotation.z = Math.PI;
-        small.position.y = headRadius*2 + shellRadius*0.25 + legLength;
-        small.position.x = -shellRadius - 2;
-        smallHead.position.x = -shellRadius + 0.4;
-        smallShell.position.y = 0;
-
-        midHead.position.x = -shellRadius + 0.4;
-        midHead.rotation.z = 3*Math.PI/4;
-        mid.position.y = shellRadius + legLength;
-
-        bigShell.position.y = legLength;
-        bigHead.position.x = -shellRadius + 0.4;
-        */
-
-        small.position.y = 4.4;
-        small.position.x = -shellRadius - 2;
-        smallHead.position.x = -shellRadius + 0.4;
-        smallShell.position.y = 0;
-        small.rotation.z = -2.5;
+        small.rotation.z = -Math.PI/2;
 
         midHead.position.x = -shellRadius + 0.4;
         midHead.rotation.z = 3*Math.PI/4;
@@ -388,9 +405,24 @@
         bigShell.position.y = legLength;
         bigHead.position.x = -shellRadius + 0.4;
         bigHead.rotation.z = 2.2
+        */
         
+        /*
         var background = createBackground(50,50,50);
         scene.add(background);
+
+        var loader = new THREE.CubeTextureLoader();
+        var skyBoxTexture = loader.load([
+            "skybox-posx.png", //pos-x (right)
+            "skybox-negx.png", //neg-x (left)
+            "skybox-posy.png", //pos-y (top)
+            "skybox-negy.png", //neg-y(bottom)
+            "skybox-posz.png", //pos-z (forward)
+            "skybox-negz.png" //neg-z (back)
+        ]);
+
+        scene.background = skyBoxTexture;
+        */
    }
 
    function createLights()
@@ -472,6 +504,27 @@
         requestAnimationFrame( render );
 
         // code for things to change here
+        var keysBig = keyframeInterp(keyframesBig, 15, clock.getElapsedTime() - startTime);
+        var keysMid = keyframeInterp(keyframesMid, 15, clock.getElapsedTime() - startTime);
+        var keysSmall = keyframeInterp(keyframesSmall, 15, clock.getElapsedTime() - startTime);
+
+        big.position.x = keysBig[0]; big.position.y = keysBig[1]; big.rotation.z = keysBig[2];
+        bigShell.position.y = keysBig[3]; 
+        bigHead.position.x = keysBig[4]; bigHead.rotation.z = keysBig[5];
+        bigLegFL.rotation.z = keysBig[6]; bigLegFR.rotation.z = keysBig[7];
+        bigLegBL.rotation.z = keysBig[8]; bigLegBR.rotation.z = keysBig[9];
+
+        mid.position.x = keysMid[0]; mid.position.y = keysMid[1]; mid.rotation.z = keysMid[2];
+        midShell.position.y = keysMid[3]; 
+        midHead.position.x = keysMid[4]; midHead.rotation.z = keysMid[5];
+        midLegFL.rotation.z = keysMid[6]; midLegFR.rotation.z = keysMid[7];
+        midLegBL.rotation.z = keysMid[8]; midLegBR.rotation.z = keysMid[9];
+
+        small.position.x = keysSmall[0]; small.position.y = keysSmall[1]; small.rotation.z = keysSmall[2];
+        smallShell.position.y = keysSmall[3]; 
+        smallHead.position.x = keysSmall[4]; smallHead.rotation.z = keysSmall[5];
+        smallLegFL.rotation.z = keysSmall[6]; smallLegFR.rotation.z = keysSmall[7];
+        smallLegBL.rotation.z = keysSmall[8]; smallLegBR.rotation.z = keysSmall[9];
 
         renderer.render(scene, camera);
 
