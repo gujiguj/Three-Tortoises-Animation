@@ -340,7 +340,7 @@
         var shell = new THREE.Object3D();
 
         var shellTex = texLoader.load("tortoise.png");
-        var shellMat = new THREE.MeshPhongMaterial( { map: tortoiseTex, color: "#64715f" } );
+        var shellMat = new THREE.MeshPhongMaterial( { map: shellTex, color: "#64715f" } );
         var shellGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var shellMesh = new THREE.Mesh(shellGeom, shellMat);
         shell.add(shellMesh);
