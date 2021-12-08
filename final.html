@@ -50,18 +50,24 @@
 
     var keyframesBig = [
         //z-rotations!!!
-        //(11) [time stamp, tortoise x, tortoise y, tortoise z-rotation, shell y, head x, head rotation, legFL rotation, legFR rotation, legBL rotation, legBR rotation]
-        [0, offsetX, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
+        //(11) [time stamp, tortoise x, tortoise y, tortoise z-rotation, shell y, head x, head rotation, tortoise z, tortoise y-rotation]
+        [0, offsetX, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0],
         // catch small
-        [0.215, offsetX, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
-        [0.225, offsetX, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        [0.215, offsetX, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0], 
+        [0.225, offsetX, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
         // standing up
-        [0.321, offsetX, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
-        [0.37, offsetX, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        [0.321, offsetX, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        [0.37, offsetX, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
         // tilting head down
-        //[0.425, 4.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], 
-        [0.395, offsetX, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], 
-        [1.0, offsetX, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0] 
+        [0.395, offsetX, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0], 
+        // lift head back up
+        [0.575, offsetX, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0], 
+        [0.625, offsetX, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // go to front of bigbowl
+        [0.825, -9, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // eat
+        [0.875, -9, 0.0, 0.0, legLength, -shellRadius + tuck, 2.0, 0.0, 0.0], 
+        [1.0, -9, 0.0, 0.0, legLength, -shellRadius + tuck, 2.0, 0.0, 0.0] 
     ]; 
 
     var keyframesMid = [
@@ -92,8 +98,8 @@
         [0.725, -20, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, -9, Math.PI/4], 
         
         // eating
-        
-        [0.775, -20, 0.0, 0.0, legLength, -shellRadius + tuck, 1.8, -6.5, Math.PI/2],
+        [0.775, -20, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, -6.5, Math.PI/2],
+        [0.8, -20, 0.0, 0.0, legLength, -shellRadius + tuck, 1.8, -6.5, Math.PI/2],
         [1.0, -20, 0.0, 0.0, legLength, -shellRadius + tuck, 1.8, -6.5, Math.PI/2]
     ];
 
@@ -144,13 +150,32 @@
         [0.6, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/4, 0.0, 0.0],
         // go to smallbowl
         [0.65, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, Math.PI/3],
-        [0.75, -16, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, Math.PI/3],
         // turn around to face smallbowl
+        [0.75, -16, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, Math.PI/3],
+        // walk towards smallbowl
         [0.805, -16, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, 0.0],
         [0.835, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, 0.0],
         // bend down and eat
         [0.85, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, 1.8, 6.0, 0.0],
         [1.0, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, 1.8, 6.0, 0.0]
+    ];
+
+    keyframesSmallLegs = [
+        /*
+        // (5) timestamp, legFL rotation, legFR rotation, legBL rotation, legBR rotation
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+        // standing up
+        [0.1, 0.0, 0.0, 0.0, 0.0],
+        // walking off Mid
+        [0.15]
+        // Mid gets up (stop moving)
+        // start walking to the bowl (start moving)
+        // try to reach over the bowl (stop moving)
+        // go to smallbowl (start)
+        // bend down and eat (stop)*/
+        [0.0, -Math.PI/6, Math.PI/6, Math.PI/6, -Math.PI/6],
+        [0.5, Math.PI/6, -Math.PI/6, -Math.PI/6, Math.PI/6],
+        [1.0, -Math.PI/6, Math.PI/6, Math.PI/6, -Math.PI/6]
     ];
 
     var keyframesBowl = [
@@ -180,7 +205,7 @@
         var t = (time - keyframes[i][0]) / (keyframes[i+1][0] - keyframes[i][0]); // what percentage t of interpolation between keyframes has been done already
 
         // linear interpolation between keyframes i and i+1 
-        for(var j = 1; j <= nKeys; j++)
+        for(var j = 1; j <= nKeys; j++) 
             keys.push((1-t) * keyframes[i][j] + t * keyframes[i+1][j]); 
 
         return keys; // returns list of interpolated rotations
@@ -607,11 +632,16 @@
         var keysSmall = keyframeInterp(keyframesSmall, 30, clock.getElapsedTime() - startTime);
         var keysBowl = keyframeInterp(keyframesBowl, 30, clock.getElapsedTime() - startTime);
 
+        var keysSmallLegs = keyframeInterp(keyframesSmallLegs, 2, clock.getElapsedTime() - startTime);
+
         big.position.x = keysBig[0]; big.position.y = keysBig[1]; big.rotation.z = keysBig[2];
         bigShell.position.y = keysBig[3]; 
         bigHead.position.x = keysBig[4]; bigHead.rotation.z = keysBig[5];
+        big.position.z = keysBig[6];
+        big.rotation.y = keysBig[7];
+        /*
         bigLegFL.rotation.z = keysBig[6]; bigLegFR.rotation.z = keysBig[7];
-        bigLegBL.rotation.z = keysBig[8]; bigLegBR.rotation.z = keysBig[9];
+        bigLegBL.rotation.z = keysBig[8]; bigLegBR.rotation.z = keysBig[9];*/
 
         mid.position.x = keysMid[0]; mid.position.y = keysMid[1]; mid.rotation.z = keysMid[2];
         midShell.position.y = keysMid[3]; 
@@ -628,10 +658,15 @@
         smallHead.position.x = keysSmall[4]; smallHead.rotation.z = keysSmall[5];
         small.position.z = keysSmall[6];
         small.rotation.y = keysSmall[7];
-        /*
-        smallLegFL.rotation.z = keysSmall[6]; smallLegFR.rotation.z = keysSmall[7];
-        smallLegBL.rotation.z = keysSmall[8]; smallLegBR.rotation.z = keysSmall[9];
-        */
+        
+        if(keysSmall[3] < legLength) {
+            smallLegFL.rotation.z = 0.0; smallLegFR.rotation.z = 0.0;
+            smallLegBL.rotation.z = 0.0; smallLegBR.rotation.z = 0.0;
+        } else {
+            smallLegFL.rotation.z = keysSmallLegs[0]; smallLegFR.rotation.z = keysSmallLegs[1];
+            smallLegBL.rotation.z = keysSmallLegs[2]; smallLegBR.rotation.z = keysSmallLegs[3];
+        }
+        
 
         bigBowl.position.x = keysBowl[0];
 
