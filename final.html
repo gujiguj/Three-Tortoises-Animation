@@ -453,7 +453,7 @@
 
         var saladTex = texLoader.load("salad.jpg");
         var saladGeom = new THREE.CircleGeometry(bowlRadius*0.85, 32);
-        var saladMat = new THREE.MeshPhongMaterial({map: saladTex, color: "#aedd73", side:THREE.DoubleSide} );
+        var saladMat = new THREE.MeshBasicMaterial({map: saladTex, color: "#aedd73", side:THREE.DoubleSide} );
         var saladMesh = new THREE.Mesh(saladGeom, saladMat);
         bowl.add(saladMesh);
         saladMesh.position.y += bowlRadius*0.85;
