@@ -9,7 +9,7 @@
 <script>
     var scene, camera, renderer; // Three.js rendering basics
     var canvas; // The canvas on which the image is rendered
-
+    var texLoader = new THREE.TextureLoader();
 
     var shellRadius = 6;
     var legRadius = 1;
@@ -32,6 +32,9 @@
     var smallShell; var smallHead; var smallTail;
     var smallLegFL; var smallLegFR; var smallLegBL; var smallLegBR;
 
+    var bigBowl;
+    var smallBowl;
+
     var mouse;
     var keyboard = new KeyboardState();
 
@@ -46,45 +49,97 @@
     var keyframesBig = [
         //z-rotations!!!
         //(11) [time stamp, tortoise x, tortoise y, tortoise z-rotation, shell y, head x, head rotation, legFL rotation, legFR rotation, legBL rotation, legBR rotation]
-        [0, 0.0, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
-        [0.4, 0.0, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // right before Small dies
-        [0.45, 0.0, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // show head and catch Small
-        [0.55, 0.0, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // holding small
-        [0.65, 0.0, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // standing up
-        [0.8, 0.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], // tilting head down for small
-        [1.0, 0.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], // tilting head down for small
+        [0, 4.0, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
+        // catch small
+        [0.215, 4.0, 0.0, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        [0.225, 4.0, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        // standing up
+        [0.321, 4.0, 0.0, 0.0, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        [0.37, 4.0, 0.0, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        // tilting head down
+        //[0.425, 4.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], 
+        [0.395, 4.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0], 
+        [1.0, 4.0, 0.0, 0.0, legLength, -shellRadius + tuck, 2.2, 0.0, 0.0, 0.0, 0.0] 
     ]; 
 
     var keyframesMid = [
         //z-rotations!!!
         //(11) [time stamp, tortoise x, tortoise y, tortoise rotation, shell y, head x, head rotation, legFL rotation, legFR rotation, legBL rotation, legBR rotation]
-        [0, 0.0, shellRadius, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
-        [0.2, 0.0, shellRadius, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // right before standing up
-        [0.25, 0.0, shellRadius, 0.0, legLength, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // standing up quickly, no head
-        [0.3, 0.0, shellRadius, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // head comes out quickly
-        [0.45, 0.0, shellRadius, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // watching Small on Big's head
-        [0.55, 0.0, shellRadius, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // watching Small on Big's head
-        [0.65, 0.0, shellRadius + legLength, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // lifted by Big
-        [1.0, 0.0, shellRadius + legLength, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], // lifted by Big
+        [0, 4.0, shellRadius, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
+        // standing up
+        [0.15, 4.0, shellRadius, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        [0.155, 4.0, shellRadius, 0.0, legLength, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        // head comes out quickly
+        [0.19, 4.0, shellRadius, 0.0, legLength, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        [0.2, 4.0, shellRadius, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        // watching Small on Big's head
+        [0.220, 4.0, shellRadius, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], 
+        // lifted by big
+        [0.321, 4.0, shellRadius, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], 
+        [0.37, 4.0, shellRadius + legLength, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0], 
+        [1.0, 4.0, shellRadius + legLength, 0.0, legLength, -shellRadius + tuck, 3*Math.PI/4, 0.0, 0.0, 0.0, 0.0] 
     ];
 
     var keyframesSmall = [
         //z-rotations!!!
-        //(11) [time stamp, tortoise x, tortoise y, tortoise rotation, shell y, head x, head rotation, legFL rotation, legFR rotation, legBL rotation, legBR rotation]
-        [0, 0.0, shellRadius*1.5, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0],
-        [0.1, 0.0, shellRadius*1.5, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // standing up and showing head
-        [0.2, -(shellRadius/2) * (Math.sqrt(2)/2), (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius, Math.PI/4, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // walking off Mid
-        [0.25, -(shellRadius/2) * (Math.sqrt(2)/2), (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius + (legLength/2), Math.PI/4, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // Mid gets up
-        [0.3, -(shellRadius/2) * (Math.sqrt(2)/2) - 2, (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius + legLength/2 + 2, Math.PI/2, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // thrown
-        [0.4, -shellRadius - 1, shellRadius, 3*Math.PI/4, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // about to die
-        [0.45, -shellRadius - 2, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // caught by Big
-        [0.5, -shellRadius - 2, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // remain for a sec
-        [0.55, -shellRadius - 2, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // head comes out
-        [0.65, -shellRadius - 2, headRadius*2 + shellRadius*0.25 + legLength, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // lifted by big
-        [0.8, -shellRadius - 2, 4.4, Math.PI + 0.64, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // rolling off
-        [0.85, -shellRadius - 4.5, 2.0, Math.PI + Math.PI/2, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // almost rolled off
-        [0.9, -shellRadius - 5, 0.0, 2*Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // head comes out
-        [1.0, -shellRadius - 5, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], // legs come out
+        //(8) [time stamp, tortoise x, tortoise y, tortoise z-rotation, shell y, head x, head rotation, tortoise z, tortoise y-rotation]
+        /* FIRST HALF */
+        [0, 4.0, shellRadius*1.5, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0],
+        // standing up and showing head
+        [0.05, 4.0, shellRadius*1.5, 0.0, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0],
+        [0.1, 4.0, shellRadius*1.5, 0.0, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // walking off Mid
+        [0.15, -(shellRadius/2) * (Math.sqrt(2)/2) + 4.0, (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius, Math.PI/4, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // Mid gets up
+        //[0.375, -(shellRadius/2) * (Math.sqrt(2)/2), (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius + (legLength/2), Math.PI/4, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0, 0.0, 0.0], 
+        [0.155, -(shellRadius/2) * (Math.sqrt(2)/2) + 4.0, (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius + (legLength/2), Math.PI/4, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // thrown
+        [0.170, -(shellRadius/2) * (Math.sqrt(2)/2) - 2 + 4.0, (shellRadius/2) * (Math.sqrt(2)/2) + shellRadius + legLength/2 + 2, Math.PI/2, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        [0.190, -shellRadius-0.5 + 4.0, shellRadius+3, 2*Math.PI/3, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0], 
+        // about to land on ground
+        //[0.29, -shellRadius - 1.5 + 4.0, shellRadius, 3*Math.PI/4, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0], 
+        // caught by Big
+        [0.225, -shellRadius - 2 + 4.0, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0], 
+        // remain for a sec
+        [0.27, -shellRadius - 2 + 4.0, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + neckLength + tuck, Math.PI/2, 0.0, 0.0],
+        // head comes out 
+        //[0.275, -shellRadius - 2 + 4.0, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        [0.28, -shellRadius - 2 + 4.0, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // remain for a sec
+        [0.32, -shellRadius - 2 + 4.0, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // lifted by big
+        [0.321, -shellRadius - 2 + 4.0, headRadius*2 + shellRadius*0.25, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        [0.37, -shellRadius - 2 + 4.0, headRadius*2 + shellRadius*0.25 + legLength, Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // rolling off
+        [0.395, -shellRadius - 2 + 4.0, 4.4, Math.PI + 0.64, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        [0.415, -shellRadius - 4.5 + 4.0, 2.0, Math.PI + Math.PI/2, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+        // rolling onto ground
+        [0.43, -shellRadius - 5 + 4.0, 0.0, 2*Math.PI, 0.0, -shellRadius + tuck, Math.PI/2, 0.0, 0.0], 
+
+        /* SECOND HALF OF ANIMATION */
+        // legs come out
+        [0.455, -shellRadius - 5 + 4.0, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0],
+        // start walking to the bowl
+        [0.555, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, 0.0],
+        // try to reach over the bowl
+        [0.575, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/4, 0.0, 0.0],
+        // pause
+        [0.6, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/4, 0.0, 0.0],
+        // go to smallbowl
+        [0.65, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, Math.PI/3],
+        [0.75, -16, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, Math.PI/3],
+        // eat
+        [0.805, -16, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, 0.0],
+        [0.835, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, 0.0],
+        [0.85, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, 1.8, 6.0, 0.0],
+        [1.0, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, 1.8, 6.0, 0.0]
+    ];
+
+    var keyframesBowl = [
+        // [timestamp, bowl x]
+        [0.0, -30],
+        [0.025, -20],
+        [1.0, -20]
     ];
 
     // TODO Step 5: Copy and paste the code for keyframeInterp here
@@ -319,6 +374,26 @@
         return tortoise;
     }
 
+    function createBowl() {
+        var bowl = new THREE.Object3D();
+        var bowlRadius = 1.0;
+        var bowlGeom = new THREE.SphereGeometry(bowlRadius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
+        var bowlMat = new THREE.MeshPhongMaterial({color: "#7c2d41", side: THREE.DoubleSide})
+        var bowlMesh = new THREE.Mesh(bowlGeom, bowlMat);
+        bowl.add(bowlMesh);
+        bowlMesh.rotation.z += Math.PI;
+        bowlMesh.position.y += bowlRadius;
+
+        var saladGeom = new THREE.CircleGeometry(bowlRadius*0.85, 32);
+        var saladMat = new THREE.MeshPhongMaterial({color: "darkgreen", side:THREE.DoubleSide} );
+        var saladMesh = new THREE.Mesh(saladGeom, saladMat);
+        bowl.add(saladMesh);
+        saladMesh.position.y += bowlRadius*0.85;
+        saladMesh.rotation.x += Math.PI/2;
+
+        return bowl;
+    }
+
     function createBackground(length, width, height) {
 
         var background = new THREE.Object3D(); 
@@ -327,7 +402,8 @@
         grassTex.wrapS = THREE.RepeatWrapping;
         grassTex.wrapT = THREE.RepeatWrapping;
         grassTex.repeat.set(2,2);
-        var material = new THREE.MeshPhongMaterial({map: grassTex, side: THREE.DoubleSide}); 
+        //var material = new THREE.MeshPhongMaterial({map: grassTex, side: THREE.DoubleSide}); 
+        var material = new THREE.MeshPhongMaterial({color: "#d88962", side: THREE.DoubleSide}); 
 
         // create ground
         var geom = new THREE.PlaneGeometry(length, width); 
@@ -335,12 +411,16 @@
         ground.rotation.x = Math.PI/2;
         background.add(ground);
 
-        /*
-        var ballGeom = new THREE.SphereGeometry(3.0, 32, 32, 0, 2*Math.PI, 0, 2*Math.PI );
-        var ball = new THREE.Mesh(ballGeom, polkaDotMat);
-        ball.position.y += 3;
-        background.add(ball);
-        */
+        bigBowl = createBowl();       
+        bigBowl.scale.set(4.0, 1.0, 4.0);
+        bigBowl.position.x = -20;
+        background.add(bigBowl);
+
+        smallBowl = createBowl();
+        smallBowl.scale.set(2.0, 0.5, 2.0);
+        smallBowl.position.x = -20;
+        smallBowl.position.z = 6;
+        background.add(smallBowl);
 
         return background; 
     }
@@ -407,10 +487,10 @@
         bigHead.rotation.z = 2.2
         */
         
-        /*
-        var background = createBackground(50,50,50);
+        
+        var background = createBackground(100,100,100);
         scene.add(background);
-
+/*
         var loader = new THREE.CubeTextureLoader();
         var skyBoxTexture = loader.load([
             "skybox-posx.png", //pos-x (right)
@@ -504,9 +584,10 @@
         requestAnimationFrame( render );
 
         // code for things to change here
-        var keysBig = keyframeInterp(keyframesBig, 15, clock.getElapsedTime() - startTime);
-        var keysMid = keyframeInterp(keyframesMid, 15, clock.getElapsedTime() - startTime);
-        var keysSmall = keyframeInterp(keyframesSmall, 15, clock.getElapsedTime() - startTime);
+        var keysBig = keyframeInterp(keyframesBig, 30, clock.getElapsedTime() - startTime);
+        var keysMid = keyframeInterp(keyframesMid, 30, clock.getElapsedTime() - startTime);
+        var keysSmall = keyframeInterp(keyframesSmall, 30, clock.getElapsedTime() - startTime);
+        var keysBowl = keyframeInterp(keyframesBowl, 30, clock.getElapsedTime() - startTime);
 
         big.position.x = keysBig[0]; big.position.y = keysBig[1]; big.rotation.z = keysBig[2];
         bigShell.position.y = keysBig[3]; 
@@ -523,8 +604,14 @@
         small.position.x = keysSmall[0]; small.position.y = keysSmall[1]; small.rotation.z = keysSmall[2];
         smallShell.position.y = keysSmall[3]; 
         smallHead.position.x = keysSmall[4]; smallHead.rotation.z = keysSmall[5];
+        small.position.z = keysSmall[6];
+        small.rotation.y = keysSmall[7];
+        /*
         smallLegFL.rotation.z = keysSmall[6]; smallLegFR.rotation.z = keysSmall[7];
         smallLegBL.rotation.z = keysSmall[8]; smallLegBR.rotation.z = keysSmall[9];
+        */
+
+        bigBowl.position.x = keysBowl[0];
 
         renderer.render(scene, camera);
 
