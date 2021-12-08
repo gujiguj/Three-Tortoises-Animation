@@ -445,8 +445,9 @@
         bowlMesh.rotation.z += Math.PI;
         bowlMesh.position.y += bowlRadius;
 
+        var saladTex = texLoader.load("salad.jpg");
         var saladGeom = new THREE.CircleGeometry(bowlRadius*0.85, 32);
-        var saladMat = new THREE.MeshPhongMaterial({color: "green", side:THREE.DoubleSide} );
+        var saladMat = new THREE.MeshPhongMaterial({map: saladTex, color: "green", side:THREE.DoubleSide} );
         var saladMesh = new THREE.Mesh(saladGeom, saladMat);
         bowl.add(saladMesh);
         saladMesh.position.y += bowlRadius*0.85;
@@ -608,7 +609,6 @@
         hut.position.x += length/2-5;
         background.add(hut);
 
-
         // bowls
         bigBowl = createBowl();       
         bigBowl.scale.set(4.0, 1.0, 4.0);
@@ -673,19 +673,19 @@
         
         var background = createBackground(penLength,penWidth,100);
         scene.add(background);
-/*
+
         var loader = new THREE.CubeTextureLoader();
         var skyBoxTexture = loader.load([
-            "skybox-posx.png", //pos-x (right)
-            "skybox-negx.png", //neg-x (left)
-            "skybox-posy.png", //pos-y (top)
-            "skybox-negy.png", //neg-y(bottom)
-            "skybox-posz.png", //pos-z (forward)
-            "skybox-negz.png" //neg-z (back)
+            "posx.png", //pos-x (right)
+            "negx.png", //neg-x (left)
+            "posy.png", //pos-y (top)
+            "negy.png", //neg-y(bottom)
+            "posz.png", //pos-z (forward)
+            "negz.png" //neg-z (back)
         ]);
 
         scene.background = skyBoxTexture;
-        */
+        
    }
 
    function createLights()
