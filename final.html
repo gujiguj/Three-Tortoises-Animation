@@ -340,6 +340,9 @@
         var shell = new THREE.Object3D();
 
         var shellTex = texLoader.load("hexagon.png");
+        shellTex.wrapS = THREE.RepeatWrapping;
+        shellTex.wrapT = THREE.RepeatWrapping;
+        shellTex.repeat.set(2,2);
         var shellMat = new THREE.MeshPhongMaterial( { map: shellTex, color: "#64715f" } );
         var shellGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var shellMesh = new THREE.Mesh(shellGeom, shellMat);
