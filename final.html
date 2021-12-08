@@ -339,7 +339,7 @@
 
         var shell = new THREE.Object3D();
 
-        var shellTex = texLoader.load("tortoise.png");
+        var shellTex = texLoader.load("hexagon.png");
         var shellMat = new THREE.MeshPhongMaterial( { map: shellTex, color: "#64715f" } );
         var shellGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var shellMesh = new THREE.Mesh(shellGeom, shellMat);
@@ -448,7 +448,7 @@
 
         var saladTex = texLoader.load("salad.jpg");
         var saladGeom = new THREE.CircleGeometry(bowlRadius*0.85, 32);
-        var saladMat = new THREE.MeshPhongMaterial({map: saladTex, color: "green", side:THREE.DoubleSide} );
+        var saladMat = new THREE.MeshPhongMaterial({map: saladTex, color: "#aedd73", side:THREE.DoubleSide} );
         var saladMesh = new THREE.Mesh(saladGeom, saladMat);
         bowl.add(saladMesh);
         saladMesh.position.y += bowlRadius*0.85;
@@ -536,7 +536,7 @@
         //plankTex.wrapT = THREE.RepeatWrapping;
         plankTex.repeat.set(2,1);
         var boxGeom = new THREE.BoxGeometry(1,1,1);
-        var wallMat = new THREE.MeshPhongMaterial({map: plankTex, color: "#ffd0ac"})
+        var wallMat = new THREE.MeshPhongMaterial({map: plankTex, color: "#feebc6"})
         var wallN = new THREE.Mesh(boxGeom, wallMat);
         var wallS = new THREE.Mesh(boxGeom, wallMat);
         var wallE = new THREE.Mesh(boxGeom, wallMat);
@@ -602,7 +602,7 @@
 
         var hut = new THREE.Object3D();
         var cylindergeom = new THREE.CylinderGeometry(shellRadius + 2, shellRadius + 2, 15, 64, 64, true);
-        var cylindermat = new THREE.MeshPhongMaterial({map: plankTex, color: "#ffd0ac", side: THREE.DoubleSide});
+        var cylindermat = new THREE.MeshPhongMaterial({map: plankTex, color: "#feebc6", side: THREE.DoubleSide});
         var hutMesh = new THREE.Mesh(cylindergeom, cylindermat);
         hutMesh.position.y += 15/2;
         hut.add(hutMesh);
