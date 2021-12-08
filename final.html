@@ -160,7 +160,7 @@
         [1.0, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, 1.8, 6.0, 0.0]
     ];
 
-    keyframesSmallLegs = [
+    keyframesLegs = [
         /*
         // (5) timestamp, legFL rotation, legFR rotation, legBL rotation, legBR rotation
         [0.0, 0.0, 0.0, 0.0, 0.0],
@@ -632,40 +632,46 @@
         var keysSmall = keyframeInterp(keyframesSmall, 30, clock.getElapsedTime() - startTime);
         var keysBowl = keyframeInterp(keyframesBowl, 30, clock.getElapsedTime() - startTime);
 
-        var keysSmallLegs = keyframeInterp(keyframesSmallLegs, 2, clock.getElapsedTime() - startTime);
+        var keysLegs = keyframeInterp(keyframesLegs, 2, clock.getElapsedTime() - startTime);
 
-        big.position.x = keysBig[0]; big.position.y = keysBig[1]; big.rotation.z = keysBig[2];
+        big.position.y = keysBig[1]; big.rotation.z = keysBig[2];
         bigShell.position.y = keysBig[3]; 
         bigHead.position.x = keysBig[4]; bigHead.rotation.z = keysBig[5];
-        big.position.z = keysBig[6];
-        big.rotation.y = keysBig[7];
-        /*
-        bigLegFL.rotation.z = keysBig[6]; bigLegFR.rotation.z = keysBig[7];
-        bigLegBL.rotation.z = keysBig[8]; bigLegBR.rotation.z = keysBig[9];*/
+        if(bigShell.position.y < legLength || (big.position.x == keysBig[0] && big.position.z == keysBig[6] && big.rotation.y == keysBig[7])) {
+            bigLegFL.rotation.z = 0.0; bigLegFR.rotation.z = 0.0;
+            bigLegBL.rotation.z = 0.0; bigLegBR.rotation.z = 0.0;
+        }
+        else {
+            bigLegFL.rotation.z = keysLegs[0]; bigLegFR.rotation.z = keysLegs[1];
+            bigLegBL.rotation.z = keysLegs[2]; bigLegBR.rotation.z = keysLegs[3];
+        }
+        big.position.x = keysBig[0]; big.position.z = keysBig[6]; big.rotation.y = keysBig[7];
 
-        mid.position.x = keysMid[0]; mid.position.y = keysMid[1]; mid.rotation.z = keysMid[2];
+        mid.position.y = keysMid[1]; mid.rotation.z = keysMid[2];
         midShell.position.y = keysMid[3]; 
         midHead.position.x = keysMid[4]; midHead.rotation.z = keysMid[5];
-        mid.position.z = keysMid[6];
-        mid.rotation.y = keysMid[7];
+        if(midShell.position.y < legLength || (mid.position.x == keysMid[0] && mid.position.z == keysMid[6] && mid.rotation.y == keysMid[7])) {
+            midLegFL.rotation.z = 0.0; midLegFR.rotation.z = 0.0;
+            midLegBL.rotation.z = 0.0; midLegBR.rotation.z = 0.0;
+        }
+        else {
+            midLegFL.rotation.z = keysLegs[0]; midLegFR.rotation.z = keysLegs[1];
+            midLegBL.rotation.z = keysLegs[2]; midLegBR.rotation.z = keysLegs[3];
+        }
+        mid.position.x = keysMid[0]; mid.position.z = keysMid[6]; mid.rotation.y = keysMid[7];
 
-        /*
-        midLegFL.rotation.z = keysMid[6]; midLegFR.rotation.z = keysMid[7];
-        midLegBL.rotation.z = keysMid[8]; midLegBR.rotation.z = keysMid[9];*/
-
-        small.position.x = keysSmall[0]; small.position.y = keysSmall[1]; small.rotation.z = keysSmall[2];
+        small.position.y = keysSmall[1]; small.rotation.z = keysSmall[2];
         smallShell.position.y = keysSmall[3]; 
         smallHead.position.x = keysSmall[4]; smallHead.rotation.z = keysSmall[5];
-        small.position.z = keysSmall[6];
-        small.rotation.y = keysSmall[7];
-        
-        if(keysSmall[3] < legLength) {
+        if(smallShell.position.y < legLength || (small.position.x == keysSmall[0] && small.position.z == keysSmall[6] && small.rotation.y == keysSmall[7])) {
             smallLegFL.rotation.z = 0.0; smallLegFR.rotation.z = 0.0;
             smallLegBL.rotation.z = 0.0; smallLegBR.rotation.z = 0.0;
-        } else {
-            smallLegFL.rotation.z = keysSmallLegs[0]; smallLegFR.rotation.z = keysSmallLegs[1];
-            smallLegBL.rotation.z = keysSmallLegs[2]; smallLegBR.rotation.z = keysSmallLegs[3];
         }
+        else {
+            smallLegFL.rotation.z = keysLegs[0]; smallLegFR.rotation.z = keysLegs[1];
+            smallLegBL.rotation.z = keysLegs[2]; smallLegBR.rotation.z = keysLegs[3];
+        }
+        small.position.x = keysSmall[0]; small.position.z = keysSmall[6]; small.rotation.y = keysSmall[7];
         
 
         bigBowl.position.x = keysBowl[0];
