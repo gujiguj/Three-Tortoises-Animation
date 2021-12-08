@@ -267,12 +267,12 @@
         height = height-radius;
         
         var cylinder = new THREE.Object3D();
-        var cylinderMat = new THREE.MeshPhongMaterial( { color:"#64715f" } );
+        var cylinderMat = new THREE.MeshPhongMaterial( { color:"#aab8a5" } );
         var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
         var cylinderMesh = new THREE.Mesh(cylinderGeom, cylinderMat);
         cylinder.add(cylinderMesh);
 
-        var sphereMat = new THREE.MeshPhongMaterial( { color: "#64715f" } );
+        var sphereMat = new THREE.MeshPhongMaterial( { color: "#aab8a5" } );
         var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
         cylinder.add(sphereMesh);
@@ -311,12 +311,12 @@
         height = height-radius;
 
         var cylinder = new THREE.Object3D();
-        var cylinderMat = new THREE.MeshPhongMaterial( { color:"#64715f" } );
+        var cylinderMat = new THREE.MeshPhongMaterial( { color:"#aab8a5" } );
         var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
         var cylinderMesh = new THREE.Mesh(cylinderGeom, cylinderMat);
         cylinder.add(cylinderMesh);
 
-        var sphereMat = new THREE.MeshPhongMaterial( { color: "#64715f" } );
+        var sphereMat = new THREE.MeshPhongMaterial( { color: "#aab8a5" } );
         var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
         cylinder.add(sphereMesh);
@@ -345,13 +345,13 @@
         shellTex.wrapT = THREE.RepeatWrapping;
         shellTex.repeat.set(2,2);
         */
-        var shellMat = new THREE.MeshPhongMaterial( { map: shellTex, color: "#303d2b" } );
+        var shellMat = new THREE.MeshPhongMaterial( { map: shellTex, color: "#64715f" } );
         var shellGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var shellMesh = new THREE.Mesh(shellGeom, shellMat);
         shell.add(shellMesh);
         
         var capGeom = new THREE.CircleGeometry(radius, 32);
-        var capMat = new THREE.MeshPhongMaterial( { color: "#303d2b" });
+        var capMat = new THREE.MeshPhongMaterial( { color: "#64715f" });
         var capMesh = new THREE.Mesh(capGeom, capMat);
         capMesh.rotation.x = Math.PI / 2;
         shellMesh.add(capMesh);
@@ -368,7 +368,7 @@
 
         var tail = new THREE.Object3D();
 
-        var tailMat = new THREE.MeshPhongMaterial( { color: "#64715f" } );
+        var tailMat = new THREE.MeshPhongMaterial( { color: "#aab8a5" } );
         var tailGeom = new THREE.ConeGeometry(radius, height, 16, 1, false);
         var tailMesh = new THREE.Mesh(tailGeom, tailMat);
         tail.add(tailMesh);
