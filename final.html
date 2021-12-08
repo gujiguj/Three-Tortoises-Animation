@@ -37,6 +37,9 @@
     var bigBowl;
     var smallBowl;
 
+    var penLength = 100;
+    var penWidth = 100;
+
     var mouse;
     var keyboard = new KeyboardState();
 
@@ -148,9 +151,8 @@
         [0.575, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/4, 0.0, 0.0],
         // pause
         [0.6, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/4, 0.0, 0.0],
-        // go to smallbowl
-        [0.65, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, Math.PI/3],
         // turn around to face smallbowl
+        [0.65, -13, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 0.0, Math.PI/3],
         [0.75, -16, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, Math.PI/3],
         // walk towards smallbowl
         [0.805, -16, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, Math.PI/2, 6.0, 0.0],
@@ -160,7 +162,7 @@
         [1.0, -17, 0.0, 2*Math.PI, legLength, -shellRadius + tuck, 1.8, 6.0, 0.0]
     ];
 
-    keyframesLegs = [
+    var keyframesLegs = [
         /*
         // (5) timestamp, legFL rotation, legFR rotation, legBL rotation, legBR rotation
         [0.0, 0.0, 0.0, 0.0, 0.0],
@@ -180,9 +182,26 @@
 
     var keyframesBowl = [
         // [timestamp, bowl x]
-        [0.0, -30],
+        [0.0, -penLength/2],
         [0.025, -20],
         [1.0, -20]
+    ];
+
+    var keyframesSmallBowl = [
+        // [timestamp, bowl x]
+        [0.0, -penLength/2],
+        [0.575, -penLength/2],
+        [0.6, -20],
+        [1.0, -20]
+    ];
+
+    var keyframesCamera = [
+        // [timestamp, position z, position y]
+        [0.0, 40, 5],
+        [0.4, 40, 5],
+        [0.5, 60, 70],
+        [0.9, 60, 70],
+        [1.0, 40, 5]
     ];
 
     // TODO Step 5: Copy and paste the code for keyframeInterp here
@@ -214,7 +233,7 @@
     // Create a camera, sitting on the positive z-axis.  The camera is not part of the scene
     function createCamera() {
         camera = new THREE.PerspectiveCamera(40, canvas.width/canvas.height, 0.1, 500);
-        camera.position.set(0,0,40); // change parameters as needed
+        camera.position.set(0,5,40); // change parameters as needed
 
         mouse = new THREE.OrbitControls(camera, renderer.domElement);
     }
@@ -248,12 +267,12 @@
         height = height-radius;
         
         var cylinder = new THREE.Object3D();
-        var cylinderMat = new THREE.MeshPhongMaterial( { color:"lightgreen" } );
+        var cylinderMat = new THREE.MeshPhongMaterial( { color:"#aab8a5" } );
         var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
         var cylinderMesh = new THREE.Mesh(cylinderGeom, cylinderMat);
         cylinder.add(cylinderMesh);
 
-        var sphereMat = new THREE.MeshPhongMaterial( { color: "lightgreen" } );
+        var sphereMat = new THREE.MeshPhongMaterial( { color: "#aab8a5" } );
         var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
         cylinder.add(sphereMesh);
@@ -292,12 +311,12 @@
         height = height-radius;
 
         var cylinder = new THREE.Object3D();
-        var cylinderMat = new THREE.MeshPhongMaterial( { color:"lightgreen" } );
+        var cylinderMat = new THREE.MeshPhongMaterial( { color:"#aab8a5" } );
         var cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 64, 64);
         var cylinderMesh = new THREE.Mesh(cylinderGeom, cylinderMat);
         cylinder.add(cylinderMesh);
 
-        var sphereMat = new THREE.MeshPhongMaterial( { color: "lightgreen" } );
+        var sphereMat = new THREE.MeshPhongMaterial( { color: "#aab8a5" } );
         var sphereGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
         cylinder.add(sphereMesh);
@@ -320,18 +339,17 @@
 
         var shell = new THREE.Object3D();
 
-        var shellMat = new THREE.MeshPhongMaterial( { color: "darkgreen" } );
+        var shellMat = new THREE.MeshPhongMaterial( { color: "#64715f" } );
         var shellGeom = new THREE.SphereGeometry(radius, 32, 32, 0, 2*Math.PI, 0, Math.PI/2 );
         var shellMesh = new THREE.Mesh(shellGeom, shellMat);
         shell.add(shellMesh);
         
         var capGeom = new THREE.CircleGeometry(radius, 32);
-        var capMat = new THREE.MeshBasicMaterial( { color: "darkgreen" });
+        var capMat = new THREE.MeshBasicMaterial( { color: "#64715f" });
         var capMesh = new THREE.Mesh(capGeom, shellMat);
         capMesh.rotation.x = Math.PI / 2;
         shellMesh.add(capMesh);
-
-        console.log("created shell:");
+        
         return shell;
     }
 
@@ -344,7 +362,7 @@
 
         var tail = new THREE.Object3D();
 
-        var tailMat = new THREE.MeshPhongMaterial( { color: "lightgreen" } );
+        var tailMat = new THREE.MeshPhongMaterial( { color: "#aab8a5" } );
         var tailGeom = new THREE.ConeGeometry(radius, height, 16, 1, false);
         var tailMesh = new THREE.Mesh(tailGeom, tailMat);
         tail.add(tailMesh);
@@ -428,13 +446,59 @@
         bowlMesh.position.y += bowlRadius;
 
         var saladGeom = new THREE.CircleGeometry(bowlRadius*0.85, 32);
-        var saladMat = new THREE.MeshPhongMaterial({color: "darkgreen", side:THREE.DoubleSide} );
+        var saladMat = new THREE.MeshPhongMaterial({color: "green", side:THREE.DoubleSide} );
         var saladMesh = new THREE.Mesh(saladGeom, saladMat);
         bowl.add(saladMesh);
         saladMesh.position.y += bowlRadius*0.85;
         saladMesh.rotation.x += Math.PI/2;
 
         return bowl;
+    }
+
+    function createPlant(leafRadius, height) {
+        var plant = new THREE.Object3D();
+
+        var geom = new THREE.ConeGeometry(leafRadius, height, 16, 1, false);
+        var mat = new THREE.MeshPhongMaterial({color: "darkgreen"});
+
+        var leafTR = createLeaf(leafRadius, height);
+        var leafTL = createLeaf(leafRadius, height);
+        var leafTC = createLeaf(leafRadius, height);
+        var leafR = createLeaf(leafRadius, height);
+        var leafL = createLeaf(leafRadius, height);
+        var leafC = createLeaf(leafRadius, height);
+        var leafBR = createLeaf(leafRadius, height);
+        var leafBL = createLeaf(leafRadius, height);
+        var leafBC = createLeaf(leafRadius, height);
+
+        plant.add(leafTR); plant.add(leafTL); plant.add(leafTC); 
+        plant.add(leafR); plant.add(leafL); plant.add(leafC); 
+        plant.add(leafBR); plant.add(leafBL); plant.add(leafBC);
+
+        leafTR.rotation.x -= Math.PI/4; leafTR.rotation.z += Math.PI/4;
+        leafTL.rotation.x -= Math.PI/4; leafTL.rotation.z -= Math.PI/4;
+        leafTC.rotation.x -= Math.PI/4;
+
+        leafR.rotation.z += Math.PI/4; leafL.rotation.z -= Math.PI/4;
+
+        leafBR.rotation.x += Math.PI/4; leafBR.rotation.z += Math.PI/4;
+        leafBL.rotation.x += Math.PI/4; leafBL.rotation.z -= Math.PI/4;
+        leafBC.rotation.x += Math.PI/4;
+
+        return plant;
+    }
+
+    function createLeaf(leafRadius, height) {
+        var leaf = new THREE.Object3D();
+
+        var geom = new THREE.ConeGeometry(leafRadius, height, 16, 1, false);
+        var mat = new THREE.MeshPhongMaterial({color: "darkgreen"});
+        var mesh = new THREE.Mesh(geom, mat);
+        mesh.position.y += height/2;
+
+        leaf.add(mesh);
+
+        return leaf;
     }
 
     function createBackground(length, width, height) {
@@ -446,14 +510,95 @@
         grassTex.wrapT = THREE.RepeatWrapping;
         grassTex.repeat.set(2,2);
         //var material = new THREE.MeshPhongMaterial({map: grassTex, side: THREE.DoubleSide}); 
-        var material = new THREE.MeshPhongMaterial({color: "#d88962", side: THREE.DoubleSide}); 
+        var material = new THREE.MeshPhongMaterial({color: "#ac6441", side: THREE.DoubleSide}); 
 
-        // create ground
+        // create pen ground
         var geom = new THREE.PlaneGeometry(length, width); 
         var ground = new THREE.Mesh( geom, material);
         ground.rotation.x = Math.PI/2;
         background.add(ground);
 
+        // outside ground
+        var geom = new THREE.PlaneGeometry(length*3, width*3); 
+        var grassMat = new THREE.MeshPhongMaterial({color: "darkgreen", side: THREE.DoubleSide});
+        var grass = new THREE.Mesh( geom, grassMat);
+        grass.rotation.x = Math.PI/2;
+        grass.position.y -= 0.02;
+        background.add(grass);
+
+        // pen walls
+        var boxGeom = new THREE.BoxGeometry(1,1,1);
+        var wallMat = new THREE.MeshPhongMaterial({color: "#e09d69"})
+        var wallN = new THREE.Mesh(boxGeom, wallMat);
+        var wallS = new THREE.Mesh(boxGeom, wallMat);
+        var wallE = new THREE.Mesh(boxGeom, wallMat);
+        var wallW = new THREE.Mesh(boxGeom, wallMat);
+
+        background.add(wallN); background.add(wallS); background.add(wallE); background.add(wallW); 
+        wallN.scale.set(length, 10.0, 5.0);
+        wallS.scale.set(length, 10.0, 5.0);
+        wallE.scale.set(5.0, 10.0, width);
+        wallW.scale.set(5.0, 10.0, width);
+        wallN.position.z -= width/2; wallS.position.z += width/2; wallE.position.x += length/2; wallW.position.x -= length/2;  
+        wallN.position.y += 5.0; wallS.position.y += 5.0; wallE.position.y += 5.0; wallW.position.y += 5.0; 
+
+        // plants
+        var plants = [];
+        var plants2 = [];
+
+        for(var i = 1; i <= 9; i++) {
+            var p = createPlant(0.25, 5.0);
+            plants.push(p);
+        }
+        for(var i = 1; i <= 6; i++) {
+            var p = createPlant(0.25, 5.0);
+            plants2.push(p);
+        }
+
+        for(var i = 0; i < plants.length; i++) {
+            plants[i].position.x = (length-5) * ((i+1)/plants.length) - (length/2) - 2;
+            plants[i].position.z -= 40;
+            background.add(plants[i]);
+        }
+        for(var i = 0; i < plants2.length; i++) {
+            plants2[i].position.x = (length-5) * ((i+1)/plants2.length) - (length/2) - 2;
+            plants2[i].position.z -= 30;
+            background.add(plants2[i]);
+        }
+
+        var bushes = [];
+        for(var i = 1; i <= 8; i++) {
+            var bush = new THREE.Object3D();
+
+            var geom = new THREE.SphereGeometry(4, 32, 32, 0, 2*Math.PI, 0, 2*Math.PI);
+            var mat = new THREE.MeshPhongMaterial({color: "darkgreen"});
+            var mesh = new THREE.Mesh(geom, mat);
+            bush.add(mesh);
+            mesh.position.y += 1;
+
+            bushes.push(bush);
+        }
+
+        for(var i = 0; i < bushes.length; i++) {
+            bushes[i].position.x = (length-5) * ((i+1)/bushes.length) - (length/2) - 2;
+            bushes[i].position.z += 40;
+            background.add(bushes[i]);
+        }
+
+        // small cylinder hut
+
+        var hut = new THREE.Object3D();
+        var cylindergeom = new THREE.CylinderGeometry(shellRadius + 2, shellRadius + 2, 15, 64, 64, true);
+        var cylindermat = new THREE.MeshPhongMaterial({color: "#e09d69", side: THREE.DoubleSide});
+        var hutMesh = new THREE.Mesh(cylindergeom, cylindermat);
+        hutMesh.position.y += 15/2;
+        hut.add(hutMesh);
+        hut.rotation.z += Math.PI/2;
+        hut.position.x += length/2-5;
+        background.add(hut);
+
+
+        // bowls
         bigBowl = createBowl();       
         bigBowl.scale.set(4.0, 1.0, 4.0);
         bigBowl.position.x = -20;
@@ -513,25 +658,9 @@
         scene.add(small);
         small.scale.set(0.25,0.25,0.25);
         small.position.y += shellRadius + shellRadius*0.5;
-
-        /*
-        small.position.y = 2.0;
-        small.position.x = -shellRadius - 4.5;
-        smallHead.position.x = -shellRadius + 0.4;
-        smallShell.position.y = 0;
-        small.rotation.z = -Math.PI/2;
-
-        midHead.position.x = -shellRadius + 0.4;
-        midHead.rotation.z = 3*Math.PI/4;
-        mid.position.y = shellRadius + legLength;
-
-        bigShell.position.y = legLength;
-        bigHead.position.x = -shellRadius + 0.4;
-        bigHead.rotation.z = 2.2
-        */
         
         
-        var background = createBackground(100,100,100);
+        var background = createBackground(penLength,penWidth,100);
         scene.add(background);
 /*
         var loader = new THREE.CubeTextureLoader();
@@ -551,17 +680,18 @@
    function createLights()
     {
         // Ambient Light (color, intensity)
-        ambient = new THREE.AmbientLight(0x404040, 1); // soft white
+        ambient = new THREE.AmbientLight("#acacac", 0.7); // soft white
         scene.add(ambient);
 
+        /*
         // DirectionalLight (color, intensity) in the direction the camera faces
         eyeLight = new THREE.DirectionalLight( "white", 0.7 );   
         eyeLight.position.set(camera.position.x,camera.position.y,camera.position.z);  // camera viewpoint
-        scene.add(eyeLight);
+        scene.add(eyeLight);*/
 
-        // Dim DirectionalLight (color, intensity) shining from above
-        topLight = new THREE.DirectionalLight( "white", 0.3 ); 
-        topLight.position.set(0,20,0);
+        // DirectionalLight (color, intensity) shining from right for the sun
+        topLight = new THREE.DirectionalLight( "white", 0.8 ); 
+        topLight.position.set(-10,20,0);
         scene.add( topLight );
 
         var helper = new THREE.DirectionalLightHelper( topLight, 1 );
@@ -622,6 +752,7 @@
         }
     } 
 
+    var x = 0;
     // Render the scene. This is called for each frame of the animation.
     function render() {
         requestAnimationFrame( render );
@@ -631,8 +762,11 @@
         var keysMid = keyframeInterp(keyframesMid, 30, clock.getElapsedTime() - startTime);
         var keysSmall = keyframeInterp(keyframesSmall, 30, clock.getElapsedTime() - startTime);
         var keysBowl = keyframeInterp(keyframesBowl, 30, clock.getElapsedTime() - startTime);
+        var keysSmallBowl = keyframeInterp(keyframesSmallBowl, 30, clock.getElapsedTime() - startTime);
 
         var keysLegs = keyframeInterp(keyframesLegs, 2, clock.getElapsedTime() - startTime);
+
+        var keysCamera = keyframeInterp(keyframesCamera, 60, clock.getElapsedTime() - startTime);
 
         big.position.y = keysBig[1]; big.rotation.z = keysBig[2];
         bigShell.position.y = keysBig[3]; 
@@ -675,6 +809,14 @@
         
 
         bigBowl.position.x = keysBowl[0];
+        smallBowl.position.x = keysSmallBowl[0];
+
+        
+        x += 0.003;
+        camera.position.x = keysCamera[0]*Math.sin(x);
+        camera.position.z = keysCamera[0]*Math.cos(x);
+
+        camera.position.y = keysCamera[1];
 
         renderer.render(scene, camera);
 
